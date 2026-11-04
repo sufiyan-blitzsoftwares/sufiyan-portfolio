@@ -3982,9 +3982,15 @@
         submitButton.disabled = true;
         form.setAttribute("aria-busy", "true");
 
+        const controller = new AbortController();
+        const requestTimeout = window.setTimeout(
+          () => controller.abort(),
+          20000,
+        );
+
         try {
           const response = await fetch(
-            form.action.replace("formsubmit.co/", "formsubmit.co/ajax/"),
+            "https://formsubmit.co/ajax/itzsufiyan.mohammed@gmail.com",
             {
               method: "POST",
               headers: {
@@ -3992,6 +3998,7 @@
                 Accept: "application/json",
               },
               body: JSON.stringify(Object.fromEntries(new FormData(form))),
+              signal: controller.signal,
             },
           );
           let result;
@@ -4014,11 +4021,19 @@
 
           form.reset();
           formStatus.textContent =
-            "Thank you for your message! It has been sent. I’ll get back to you soon.";
+            "Your message was accepted by the contact service. I’ll get back to you soon.";
         } catch (error) {
-          formStatus.textContent =
-            error instanceof TypeError ? "" : error.message;
+          if (error.name === "AbortError") {
+            formStatus.textContent =
+              "The request timed out. Please try again or email me directly at itzsufiyan.mohammed@gmail.com.";
+          } else if (error instanceof TypeError) {
+            formStatus.textContent =
+              "Could not connect to the contact service. Please try again or email me directly at itzsufiyan.mohammed@gmail.com.";
+          } else {
+            formStatus.textContent = error.message;
+          }
         } finally {
+          window.clearTimeout(requestTimeout);
           submitButton.disabled = false;
           form.removeAttribute("aria-busy");
         }

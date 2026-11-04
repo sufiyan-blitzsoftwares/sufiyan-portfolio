@@ -13,9 +13,9 @@ Open `index.html` directly in a browser, or serve this folder with any static we
 The Tailwind utility stylesheet is precompiled and embedded, so no external scripts, fonts, images, or network dependencies are required to render the page. Custom CSS provides the visual design and responsive layouts. Project artwork is original typographic artwork, not screenshots of the live sites.
 
 ## Contact form
-The contact form validates required fields and email format, then opens an encoded `mailto:` draft addressed to `itzsufiyan.mohammed@gmail.com`. The visitor must have an email application configured and send the draft themselves. The page explicitly explains this, does not report that a message was sent, and retains form fields for copying. Direct email and phone links also work.
+The contact form validates required fields and email format, then submits to FormSubmit's AJAX endpoint for `itzsufiyan.mohammed@gmail.com`. The request times out after 20 seconds and reports service, network, or timeout failures while retaining the form fields so the visitor can retry. A successful response means FormSubmit accepted the request; it does not guarantee inbox delivery.
 
-For silent/direct submission, connect a server-side endpoint or a form provider, replace the form submission handler, and only show a sent confirmation after a successful server response. Do not put email-service secrets in client-side code.
+On the first submission, FormSubmit may send an activation email to the configured recipient. Open that message and follow its activation link before expecting contact-form submissions to be delivered. Check spam/junk if the activation or contact message is missing. Direct email and phone links are also available as alternatives. Do not put email-service secrets in client-side code.
 
 ## Included interactions and accessibility
 - Sticky navigation with active-section indicators.
