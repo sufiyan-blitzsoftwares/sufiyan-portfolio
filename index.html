@@ -3668,20 +3668,9 @@
           </div>
           <form
             id="contact-form"
-            action="https://formsubmit.co/itzsufiyan.mohammed@gmail.com"
+            action="/api/contact"
             method="post"
           >
-            <input
-              type="hidden"
-              name="_subject"
-              value="New portfolio contact form lead"
-            />
-            <input type="hidden" name="_captcha" value="false" />
-            <input
-              type="hidden"
-              name="_next"
-              value="https://sufiyan-portfolio-flame-mu.vercel.app/?contact=success#contact"
-            />
             <input
               type="text"
               name="_honey"
@@ -3758,8 +3747,7 @@
             ></p>
             <noscript
               ><p class="form-note">
-                JavaScript is off. You can still submit the form, or email me
-                directly using the link.
+                JavaScript is off. Please email me directly using the link.
               </p></noscript
             >
           </form>
@@ -3977,14 +3965,55 @@
 
       const form = document.querySelector("#contact-form");
       const formStatus = document.querySelector("#form-status");
+      const submitButton = form.querySelector('button[type="submit"]');
       form.setAttribute("aria-describedby", "form-help form-status");
-      if (
-        new URLSearchParams(window.location.search).get("contact") ===
-        "success"
-      ) {
-        formStatus.textContent =
-          "Your message was submitted. Thank you — I’ll get back to you soon.";
-      }
+      form.addEventListener("submit", async (event) => {
+        event.preventDefault();
+        if (!form.reportValidity()) return;
+
+        formStatus.textContent = "Sending your message…";
+        submitButton.disabled = true;
+        form.setAttribute("aria-busy", "true");
+        const controller = new AbortController();
+        const timeout = window.setTimeout(() => controller.abort(), 20000);
+
+        try {
+          const response = await fetch(form.action, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Accept: "application/json",
+            },
+            body: JSON.stringify(Object.fromEntries(new FormData(form))),
+            signal: controller.signal,
+          });
+          const result = await response.json().catch(() => null);
+          if (!response.ok || result?.success !== true) {
+            throw new Error(
+              result?.message ||
+                "Your message could not be sent. Please email me directly.",
+            );
+          }
+
+          form.reset();
+          formStatus.textContent =
+            "Your message was sent successfully. I’ll get back to you soon.";
+        } catch (error) {
+          if (error.name === "AbortError") {
+            formStatus.textContent =
+              "The request timed out. Please try again or email me directly at itzsufiyan.mohammed@gmail.com.";
+          } else if (error instanceof TypeError) {
+            formStatus.textContent =
+              "Could not connect to the contact service. Please try again or email me directly at itzsufiyan.mohammed@gmail.com.";
+          } else {
+            formStatus.textContent = error.message;
+          }
+        } finally {
+          window.clearTimeout(timeout);
+          submitButton.disabled = false;
+          form.removeAttribute("aria-busy");
+        }
+      });
 
       const projectCards = Array.from(
         document.querySelectorAll(".project-card[data-services]"),
