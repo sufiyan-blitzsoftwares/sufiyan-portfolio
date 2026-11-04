@@ -3668,15 +3668,9 @@
           </div>
           <form
             id="contact-form"
-            action="https://formsubmit.co/itzsufiyan.mohammed@gmail.com"
+            action="/api/contact"
             method="post"
           >
-            <input
-              type="hidden"
-              name="_subject"
-              value="New portfolio contact form lead"
-            />
-            <input type="hidden" name="_captcha" value="false" />
             <input
               type="text"
               name="_honey"
@@ -3985,50 +3979,37 @@
         const controller = new AbortController();
         const requestTimeout = window.setTimeout(
           () => controller.abort(),
-          20000,
+          25000,
         );
 
         try {
-          const response = await fetch(
-            "https://formsubmit.co/ajax/itzsufiyan.mohammed@gmail.com",
-            {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-                Accept: "application/json",
-              },
-              body: JSON.stringify(Object.fromEntries(new FormData(form))),
-              signal: controller.signal,
+          const response = await fetch(form.action, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Accept: "application/json",
             },
-          );
-          let result;
-          try {
-            result = await response.json();
-          } catch {
+            body: JSON.stringify(Object.fromEntries(new FormData(form))),
+            signal: controller.signal,
+          });
+          const result = await response.json().catch(() => null);
+          if (!response.ok || result?.success !== true) {
             throw new Error(
-              "The form service returned an unexpected response. Please try again or email me directly.",
-            );
-          }
-          if (
-            !response.ok ||
-            (result.success !== true && result.success !== "true")
-          ) {
-            throw new Error(
-              result.message ||
+              result?.message ||
                 "The message could not be sent. Please try again or email me directly.",
             );
           }
 
           form.reset();
           formStatus.textContent =
-            "Your message was accepted by the contact service. I’ll get back to you soon.";
+            "Your message was sent successfully. I’ll get back to you soon.";
         } catch (error) {
           if (error.name === "AbortError") {
             formStatus.textContent =
               "The request timed out. Please try again or email me directly at itzsufiyan.mohammed@gmail.com.";
           } else if (error instanceof TypeError) {
             formStatus.textContent =
-              "Could not connect to the contact service. Please try again or email me directly at itzsufiyan.mohammed@gmail.com.";
+              "Could not connect to the website. Please try again or email me directly at itzsufiyan.mohammed@gmail.com.";
           } else {
             formStatus.textContent = error.message;
           }
