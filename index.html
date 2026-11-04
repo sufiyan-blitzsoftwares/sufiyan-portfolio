@@ -3668,9 +3668,20 @@
           </div>
           <form
             id="contact-form"
-            action="/api/contact"
+            action="https://formsubmit.co/itzsufiyan.mohammed@gmail.com"
             method="post"
           >
+            <input
+              type="hidden"
+              name="_subject"
+              value="New portfolio contact form lead"
+            />
+            <input type="hidden" name="_captcha" value="false" />
+            <input
+              type="hidden"
+              name="_next"
+              value="https://sufiyan-portfolio-flame-mu.vercel.app/?contact=success#contact"
+            />
             <input
               type="text"
               name="_honey"
@@ -3966,59 +3977,14 @@
 
       const form = document.querySelector("#contact-form");
       const formStatus = document.querySelector("#form-status");
-      const submitButton = form.querySelector('button[type="submit"]');
       form.setAttribute("aria-describedby", "form-help form-status");
-      form.addEventListener("submit", async (event) => {
-        event.preventDefault();
-        if (!form.reportValidity()) return;
-
-        formStatus.textContent = "Sending your message…";
-        submitButton.disabled = true;
-        form.setAttribute("aria-busy", "true");
-
-        const controller = new AbortController();
-        const requestTimeout = window.setTimeout(
-          () => controller.abort(),
-          25000,
-        );
-
-        try {
-          const response = await fetch(form.action, {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-              Accept: "application/json",
-            },
-            body: JSON.stringify(Object.fromEntries(new FormData(form))),
-            signal: controller.signal,
-          });
-          const result = await response.json().catch(() => null);
-          if (!response.ok || result?.success !== true) {
-            throw new Error(
-              result?.message ||
-                "The message could not be sent. Please try again or email me directly.",
-            );
-          }
-
-          form.reset();
-          formStatus.textContent =
-            "Your message was sent successfully. I’ll get back to you soon.";
-        } catch (error) {
-          if (error.name === "AbortError") {
-            formStatus.textContent =
-              "The request timed out. Please try again or email me directly at itzsufiyan.mohammed@gmail.com.";
-          } else if (error instanceof TypeError) {
-            formStatus.textContent =
-              "Could not connect to the website. Please try again or email me directly at itzsufiyan.mohammed@gmail.com.";
-          } else {
-            formStatus.textContent = error.message;
-          }
-        } finally {
-          window.clearTimeout(requestTimeout);
-          submitButton.disabled = false;
-          form.removeAttribute("aria-busy");
-        }
-      });
+      if (
+        new URLSearchParams(window.location.search).get("contact") ===
+        "success"
+      ) {
+        formStatus.textContent =
+          "Your message was submitted. Thank you — I’ll get back to you soon.";
+      }
 
       const projectCards = Array.from(
         document.querySelectorAll(".project-card[data-services]"),

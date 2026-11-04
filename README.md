@@ -13,16 +13,7 @@ Open `index.html` directly in a browser, or serve this folder with any static we
 The Tailwind utility stylesheet is precompiled and embedded, so no external scripts, fonts, images, or network dependencies are required to render the page. Custom CSS provides the visual design and responsive layouts. Project artwork is original typographic artwork, not screenshots of the live sites.
 
 ## Contact form
-The contact form submits to the Vercel serverless function in `api/contact.js`, which sends email through Resend to `itzsufiyan.mohammed@gmail.com`. The Resend API key stays on the server and is never exposed in the page. The endpoint validates submissions, filters the hidden honeypot field, and returns a clear error if delivery fails.
-
-### Configure email delivery on Vercel
-1. Create a Resend account and verify a domain you control under **Domains**. A public Vercel subdomain is not a sending domain.
-2. Create a Resend API key with permission to send email.
-3. In the Vercel project, open **Settings → Environment Variables** and add `RESEND_API_KEY` (the API key) and `CONTACT_FROM_EMAIL` (a sender address on the verified domain, such as `Portfolio <contact@yourdomain.com>`).
-4. Apply the variables to the production environment and redeploy the project.
-5. Submit a test from the deployed site and check the Resend email logs if it fails. The recipient is currently `itzsufiyan.mohammed@gmail.com`; replies to the notification go to the visitor's submitted email address.
-
-Without those two Vercel environment variables, the endpoint deliberately reports that it is not configured rather than claiming that a message was sent. Direct email and phone links are also available as alternatives. Never put the Resend API key in `index.html`.
+The contact form uses a normal HTML POST to FormSubmit. It does not need a Vercel function, API key, or environment variables. FormSubmit may require you to confirm `itzsufiyan.mohammed@gmail.com` the first time a message is sent; check the inbox and spam folder for its activation email and follow the link. The visitor is returned to the portfolio after submission. Direct email and phone links are also available as alternatives.
 
 ## Included interactions and accessibility
 - Sticky navigation with active-section indicators.
